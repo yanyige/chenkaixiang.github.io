@@ -177,20 +177,38 @@
     else {
       // 如果按了 + - * / 中的一个
       if (event.target.innerHTML == '+' || event.target.innerHTML == '-' || event.target.innerHTML == '*' || event.target.innerHTML == '/') {
-        if (op == '=') {
-          stack2 = ans.toString().split('');
+        if (stack1[0] != '0' && stack2[0] != '0') {
+          // 如果按了=符号，将stack1 op stack2
+          // 将stack1变成字符串
+          var num1 = toNum(stack1);
+          // 将stack2变成字符串
+          var num2 = toNum(stack2);
+          // 计算结果
+          ans = eval(num2 + op + num1);
+          // 显示结果 stack1 => ans
+          stack1 = ans.toString().split('');
+          console.log('stack1', stack1);
+          stack2 = [].concat(stack1);
           op = event.target.innerHTML;
+          renderOutput1(stack1);
+          // console.log('结果是', ans);  
           init1();
+        } else {
+          if (op == '=') {
+            stack2 = ans.toString().split('');
+            op = event.target.innerHTML;
+            init1();
+            renderOutput();
+            return;
+          }
+          // 初始化 stack1
+          init();
+          // 把下面的内容放到上面
+          stack2 = [].concat(stack1);
+          //  给操作符赋值
+          op = event.target.innerHTML;
           renderOutput();
-          return;
         }
-        // 初始化 stack1
-        init();
-        // 把下面的内容放到上面
-        stack2 = [].concat(stack1);
-        //  给操作符赋值
-        op = event.target.innerHTML;
-        renderOutput()
       } else {
         // 如果只有一个零，那么我就把零去掉，变成输入的数值
         if (stack1.length == 1 && stack1[0] == '0') {
