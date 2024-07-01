@@ -127,31 +127,53 @@
 </body>
 
 <script type="text/javascript">
+
+  // 初始化
+  var stack1;
+
   // 显示你按下的按钮
   //  1. 获得按下的按钮
   var btns = document.querySelectorAll('.digit');
   //  2. 绑定点击事件
   for (var i = 0; i < btns.length; i ++) {
-    btns[i].addEventListener('click', foo);
+    btns[i].addEventListener('click', (event) => {
+      foo(event, stack1);
+    });
   }
 
-  // 初始化
-  var stack1 = [];
+
+  init();
+  renderOutput(stack1.join(""));
   // 点击之后做的事情
-  function foo(event) {
+  function foo(event, stack1) {
     // 如果我按了C
-    if (event.target.innerHTML == 'C') {
-      // 显示 0
-      document.querySelector("#stack1").innerHTML = 0;
+    if (event.target.innerHTML == 'C' || event.target.innerHTML == 'CE') {
+      // 展示 0
+      renderOutput(0);
       // 初始化stack
-      stack1 = [];
+      init();
     } else {
+      // 如果只有一个零，那么我就把零去掉，变成输入的数值
+      if (stack1.length == 1 && stack1[0] == '0') {
+        // 把零去掉
+        stack1.pop();
+      }
       // 将点击后的内容放在一起，显示出来
       // 将按到的值 添加到 stack1 数组中
       stack1.push(event.target.innerHTML);
-      // 将stack1展示出来
-      document.querySelector("#stack1").innerHTML = stack1.join("");
+      // 展示 算式
+      renderOutput(stack1.join(""));
     }
+  }
+
+  // 渲染输出
+  function renderOutput(content) {
+    document.querySelector("#stack1").innerHTML = content;
+  }
+
+  // 初始化输出
+  function init() {
+    stack1 = [0];
   }
 </script>
 </html>
