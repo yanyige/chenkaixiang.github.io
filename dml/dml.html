@@ -129,7 +129,7 @@
 
     } 
     .ans {
-      width: 50px;
+      width: 80px;
       height: 18px;
     }
     #quiz, #post {
@@ -142,12 +142,14 @@
   <nav class="navbar bg-body-tertiary">
     <div class="container-fluid">
       <a class="navbar-brand">快乐运算:)</a>
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" type="search" placeholder="Eamil" aria-label="Search">
-        <input class="form-control me-2" type="search" placeholder="Password" aria-label="Search">
-        <button type="button" class="btn btn-success text-nowrap">Sign in</button>
-        <button type="button" class="btn btn-danger text-nowrap">Sign up</button>
+      <form class="d-flex login_form" role="search">
+        <input id="username" class="form-control me-2" type="search" placeholder="Username" >
+        <input id="password" class="form-control me-2" type="password" placeholder="Password" >
+        <button type="button" id="sign_in" class="btn btn-success text-nowrap">Sign in</button>
+        <button type="button" id="sign_up" class="btn btn-danger text-nowrap">Sign up</button>
       </form>
+      <div class="logged-user"></div>
+      <button class="logout" style="display: none;">log out</button>
     </div> 
   </nav> 
   <div class="p-5 mb-4 bg-light header">
@@ -169,13 +171,13 @@
   <div class="content" style="height: 550px; background-color: black; color:white;padding-top: 30px;">
     <div class="row g-2">
       <div id="quiz" class="col-md-5" style="height: 350px;background-color: rgb(79, 77, 77);margin-bottom: 20px;padding-top: 20px;  display: none;">
-        <span>请回答下列问题</span>
-        <table class="table table-dark table-hover" style="margin: 20px auto; width: 90%;">
+        <span>请回答下列问题（保留两位小数）</span>
+        <table class="table table-dark table-hover" style="margin: 20px auto; width: 90%; margin-bottom: 0;">
           <thead>
             <tr>
               <th scope="col" class="col-md-2">序号</th>
-              <th scope="col" class="col-md-9">题目</th>
-              <th scope="col" class="col-md-1">答案</th>
+              <th scope="col" class="col-md-7">题目</th>
+              <th scope="col" class="col-md-3">答案</th>
             </tr>
           </thead>
           <tbody>
@@ -207,7 +209,7 @@
           </tbody>
         </table>
 
-        <button class="submit">提交</button>
+        <button class="submit" style="margin-right: 29px; float: right;">提交</button>
       </div>
       <div id="post" class="col-md-5" style="height: 350px;background-color: rgb(79, 77, 77);margin-bottom: 20px;padding-top: 20px;">
         <span>小试牛刀</span>
@@ -279,108 +281,42 @@
       </div>
     </div>
   </div>
-  <h1 style="display: block">To be continued...</h1>
+  <h1 style="display: block; position: absolute; left: 0; margin-top: -100px;">To be continued...</h1>
   </div>
   </div>
-  <nav class="navbar">
-    <div class="row1">
+  <nav class="navbar fixed-bottom bg-body-tertiary">
       <div class="col-md-6 btn-success" style="min-height: 30px; line-height: 30px; text-align: center;background-color: green;">个人匹配</div>
-      <div class="col-md-6 btn-warning" style="min-height: 30px; line-height: 30px; text-align: center;background-color: orange;">多人对战</div> 
-    </div>
+      <div class="col-md-6 btn-warning" style="min-height: 30px; line-height: 30px; text-align: center;background-color: orange; right:0">多人对战</div> 
   </nav>
 </body>
+<script type="text/javascript" src="calc.js"></script>
+<script type="text/javascript" src="login.js"></script>
 <script type="text/javascript">
-  console.log('begin');
-  // 分数
-  var score = 0;
-  // 题目列表
-  var quiz_list = [];
-  // 1. 获取按钮
-  btns = document.querySelector('.dropdown-menu').querySelectorAll('li');
-  // 2. 为这个按钮绑定事件
-  for (var i = 0; i < btns.length; i ++) {
-    btns[i].addEventListener('click', showQuiz);
-  }
-  // 3.点击提交，返回题目列表
-  // 获取提交按钮
-  submit_btn = document.querySelector('.submit');
-  submit_btn.addEventListener('click', () => {
-    // 获得用户提供答案
-    // 拿到这些input
-    var trs = document.querySelector('.table').querySelector('tbody').querySelectorAll('tr');
-    for (var i = 0; i < trs.length; i ++) {
-      var input = trs[i].querySelector('input');
-      if (input.value == eval(quiz_list[i])) {
-        score ++;
-      }
-    }
-    // 展示score
-    showScore(score);
-
-    // 拿到要隐藏的元素div
-    var node = document.querySelector("#quiz");
-    // 隐藏
-    node.style.display = 'none';
-    // 拿到要显示的div
-    node = document.querySelector('#post');
-    node.style.display = 'block';
-  });
-
-  // 展示题目
-  function showQuiz(event) {
-    // 获取点击的是哪个难度？
-    var difficulty = event.target.innerHTML
-    console.log('我点啦, 点的是谁呢？', difficulty);
-    // 生成5题!
-    for(var i = 0; i < 5; i ++) {
-      quiz_list.push(generateQuiz());
-    }
-    console.log('生成的题目是', quiz_list);
-    // 将题目放到指定位置
-    // 拿到位置的元素
-    var ele = document.querySelector('.table').querySelector('tbody').querySelectorAll('tr');
-    console.log('元素是', ele);
-    for(var i = 0; i < ele.length; i ++) {
-      var td = ele[i].querySelector('td');
-      // 将生成的题目放到元素上
-      td.innerText = quiz_list[i];
+  // 判断用户是否登录
+  var username = localStorage.getItem("username");
+  // 如果已经登录
+  if (username != null && username.length > 0) {
+    // 获得登录的按钮们
+    var btns = document.querySelector(".login_form");
+    for (var i = 0; i < btns.length; i ++) {
+      btns[i].style.display = 'none';
     }
 
-    // 拿到要隐藏的元素div
-    var node = document.querySelector("#post");
-    // 隐藏
-    node.style.display = 'none';
-    // 拿到要显示的div
-    node = document.querySelector('#quiz');
-    node.style.display = 'block';
+    document.querySelector('.logout').style.display = 'block';
+    // 显示当前用户的名字，和登出按钮
+    document.querySelector(".logged-user").innerHTML = username;
   }
 
-  // 生成题目
-  function generateQuiz() {
-    quiz = [];
-    for (var i = 0; i < 5; i ++) {
-      // 思考一下，如何生成一个数字，再生成一个字符呢？
-      if (i % 2 == 0) {
-        quiz.push(Math.round(Math.random() * 50));
-      } else {
-        // 生成字符
-        quiz.push(generateOp());
-      }
-    }
-    return quiz.join('');
+  // 登出功能
+  var btn = document.querySelector('.logout');
+  btn.addEventListener('click', logout);
+
+  // 登出功能
+  function logout() {
+    localStorage.removeItem('username');
+    // 刷新页面
+    location.reload();
   }
 
-  // 生成字符
-  function generateOp() {
-    ops = ['+', '-', '*', '/'];
-    return ops[Math.floor(Math.random() * 4)];
-  }
-
-  function showScore(score) {
-    // 拿到放分数的元素
-    var ele = document.querySelector('.ggscore');
-    // 把分数放进去
-    ele.innerText = score;
-  }
 </script>
 </html>
